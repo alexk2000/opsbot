@@ -77,28 +77,6 @@ Usage:
 
    ```
 
-## Prometheus metrics
-If it's needed each subcommand could export Prometheus metrics regarding its usage ([code example](src/slack/cmd/secret/__init__.py#L31)).
-Metrics endpoint - https://\<OpsBot DNS name\>/metrics.
-
-```
-# HELP opsbot_ansible_vault_encrypted_total total number of encrypted secrets
-# TYPE opsbot_ansible_vault_encrypted_total counter
-opsbot_ansible_vault_encrypted_total 3.0
-
-# HELP opsbot_secrets_created_total total number of created secrets
-# TYPE opsbot_secrets_created_total counter
-opsbot_secrets_created_total 2.0
-
-# HELP opsbot_secrets_expired_total total number of expired secrets
-# TYPE opsbot_secrets_expired_total counter
-opsbot_secrets_expired_total 0.0
-
-# HELP opsbot_secrets_stored number of secrets stored in db now
-# TYPE opsbot_secrets_stored gauge
-opsbot_secrets_stored 0.0
-```
-
 ## Python
 
 OpsBot is build with Python using:
@@ -152,6 +130,33 @@ SUBCMDS: list[dict] = [
 ]
 ```
 
+## Environments variables
+### Common variables
+
+`SLACK_BOT_TOKEN` - Slack bot token, [one of Slack app tokens](https://slack.dev/bolt-python/tutorial/getting-started#tokens-and-installing-apps)
+
+`SLACK_APP_TOKEN` - Slack app-level token, [one of Slack app tokens](https://slack.dev/bolt-python/tutorial/getting-started#tokens-and-installing-apps)
+
+`SLACK_CMD` - Slack command used by users (default `/opsbot`)
+
+`HTTP_PORT` - OpsBot http port (default `8080`)
+
+`LOG_LEVEL` - log level (default `info`)
+
+`APP_NAME` - OpsBot app name, e.g. used by `/info` endpoint (default `opsbot`)
+
+`MY_URL` - URL to access OpsBot by http (default `localhost`)
+
+### ***ansible_vault*** subcommand specific variables
+
+`ANSIBLE_VAULT_KEYS_DIR` - path to directory with ansible-vault encryption keys (default `os.getcwd() + "/ansible_vault_keys"`)
+
+### ***secret*** subcommand specific variables
+
+`SECRET_TTL` - time period (in seconds) after which the secret is deleted if it wasn't requested (default `600`)
+
+`SECRET_CLEANUP_PERIOD` - time period (in seconds) between clean up run which removes expired (reached `SECRET_TTL`) secrets (default `10`)
+
 ## Health check and version endpoints
 
 ```
@@ -160,4 +165,26 @@ SUBCMDS: list[dict] = [
 
 ❯ curl https://<OpsBot DNS name>/info
 {"name": "opsbot", "version": "0.0.4"}
+```
+
+## Prometheus metrics
+If it's needed each subcommand could export Prometheus metrics regarding its usage ([code example](src/slack/cmd/secret/__init__.py#L31)).
+Metrics endpoint - https://\<OpsBot DNS name\>/metrics.
+
+```
+# HELP opsbot_ansible_vault_encrypted_total total number of encrypted secrets
+# TYPE opsbot_ansible_vault_encrypted_total counter
+opsbot_ansible_vault_encrypted_total 3.0
+
+# HELP opsbot_secrets_created_total total number of created secrets
+# TYPE opsbot_secrets_created_total counter
+opsbot_secrets_created_total 2.0
+
+# HELP opsbot_secrets_expired_total total number of expired secrets
+# TYPE opsbot_secrets_expired_total counter
+opsbot_secrets_expired_total 0.0
+
+# HELP opsbot_secrets_stored number of secrets stored in db now
+# TYPE opsbot_secrets_stored gauge
+opsbot_secrets_stored 0.0
 ```
